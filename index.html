@@ -1,0 +1,2584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Responsividade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Informações da página -->
+    <meta
+        name="description"
+        content="Calculadora de energia para simulação de consumo, descontos, compensação e economia."
+    >
+
+    <title>Calculadora de Energia | Sistema 4K</title>
+
+    <!-- =========================================================
+         FONTES
+         ========================================================= -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =========================================================
+           1. VARIÁVEIS GLOBAIS
+           Centraliza cores, espaçamentos e elementos do tema.
+           ========================================================= */
+
+        :root {
+
+            /* Fundos */
+            --bg-absolute: #000000;
+            --bg-card: rgba(15, 15, 26, 0.92);
+            --bg-input: rgba(0, 0, 0, 0.65);
+            --bg-input-focus: rgba(0, 0, 0, 0.90);
+
+            --bg-gradient:
+                radial-gradient(
+                    circle at top center,
+                    #0f051d 0%,
+                    #000000 100%
+                );
+
+            /* Cores neon */
+            --neon-cyan: #00f3ff;
+            --neon-green: #00ff9d;
+            --neon-red: #ff0055;
+            --neon-orange: #ff9900;
+            --neon-purple: #bc13fe;
+
+            /* Textos */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-white: #ffffff;
+
+            /* Bordas */
+            --border-glass: rgba(0, 243, 255, 0.15);
+            --border-soft: rgba(255, 255, 255, 0.06);
+
+            /* Dimensões */
+            --container-width: 1350px;
+            --radius-card: 14px;
+            --radius-input: 7px;
+
+            /* Sombras */
+            --shadow-card:
+                0 10px 35px rgba(0, 0, 0, 0.60);
+
+            --shadow-orange:
+                0 0 5px rgba(255, 153, 0, 0.90),
+                0 0 12px rgba(255, 153, 0, 0.60),
+                0 0 24px rgba(255, 153, 0, 0.30);
+
+            /* Transições */
+            --transition-fast: 180ms ease;
+            --transition-normal: 300ms ease;
+        }
+
+
+        /* =========================================================
+           2. RESET E CONFIGURAÇÕES GERAIS
+           ========================================================= */
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            color-scheme: dark;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            padding: 16px 10px;
+
+            font-family: "Inter", sans-serif;
+            color: var(--text-main);
+
+            background-color: var(--bg-absolute);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+        }
+
+
+        /* =========================================================
+           3. CABEÇALHO
+           ========================================================= */
+
+        .app-header {
+            width: 100%;
+            margin-bottom: 26px;
+            text-align: center;
+        }
+
+        .app-title {
+            margin: 0 0 5px;
+
+            font-family: "Rajdhani", sans-serif;
+            font-size: clamp(1.8rem, 3vw, 2.25rem);
+            font-weight: 700;
+
+            letter-spacing: 2px;
+            line-height: 1.1;
+
+            color: var(--text-white);
+
+            text-transform: uppercase;
+        }
+
+        /* Título principal em Laranja Neon */
+        .app-title__highlight {
+            color: var(--neon-orange);
+            text-shadow: var(--shadow-orange);
+        }
+
+        .app-subtitle {
+            margin: 0;
+
+            font-family: "Rajdhani", sans-serif;
+            font-size: 0.95rem;
+
+            letter-spacing: 1px;
+
+            color: var(--text-muted);
+
+            text-transform: uppercase;
+        }
+
+
+        /* =========================================================
+           4. ESTRUTURA PRINCIPAL
+           ========================================================= */
+
+        .app-main {
+            width: 100%;
+            max-width: var(--container-width);
+            flex: 1;
+        }
+
+        .calculator-grid {
+            width: 100%;
+
+            display: grid;
+            grid-template-columns: 1fr;
+
+            gap: 20px;
+
+            transition:
+                grid-template-columns 500ms ease,
+                gap 300ms ease;
+        }
+
+
+        /* =========================================================
+           5. CARDS / COLUNAS
+           ========================================================= */
+
+        .panel {
+            min-width: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 15px;
+
+            padding: 20px;
+
+            background: var(--bg-card);
+
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-card);
+
+            box-shadow: var(--shadow-card);
+
+            overflow: hidden;
+        }
+
+        .panel__title {
+            margin: 0 0 5px;
+
+            padding-bottom: 10px;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, 0.08);
+
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+
+            text-align: center;
+            text-transform: uppercase;
+
+            letter-spacing: 1.5px;
+
+            color: var(--neon-purple);
+        }
+
+
+        /* =========================================================
+           6. TABELAS
+           ========================================================= */
+
+        .data-table {
+            width: 100%;
+
+            border-collapse: collapse;
+            border-spacing: 0;
+
+            font-size: 0.85rem;
+        }
+
+        .data-table td {
+            padding: 8px 10px;
+
+            border-bottom:
+                1px solid var(--border-soft);
+
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .data-table td:first-child {
+            color: var(--text-main);
+            font-weight: 400;
+        }
+
+        .data-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+
+        /* =========================================================
+           7. CAMPOS DE FORMULÁRIO
+           ========================================================= */
+
+        .input-user {
+            width: 72%;
+            max-width: 165px;
+
+            display: block;
+
+            margin-left: auto;
+
+            padding: 7px 10px;
+
+            border:
+                1px solid rgba(0, 243, 255, 0.30);
+
+            border-radius: var(--radius-input);
+
+            outline: none;
+
+            background: var(--bg-input);
+
+            color: var(--neon-cyan);
+
+            font-weight: 600;
+            font-size: 0.9rem;
+
+            text-align: right;
+
+            transition:
+                border-color var(--transition-fast),
+                background var(--transition-fast),
+                color var(--transition-fast),
+                box-shadow var(--transition-fast);
+        }
+
+        .input-user:hover {
+            border-color:
+                rgba(0, 243, 255, 0.60);
+        }
+
+        .input-user:focus {
+            border-color: var(--neon-green);
+
+            background: var(--bg-input-focus);
+
+            color: var(--neon-green);
+
+            box-shadow:
+                0 0 0 2px rgba(0, 255, 157, 0.08),
+                0 0 12px rgba(0, 255, 157, 0.08);
+        }
+
+        select.input-user {
+            width: 100%;
+            max-width: 100%;
+
+            color: var(--text-white);
+
+            text-align: left;
+
+            cursor: pointer;
+        }
+
+        select.input-user option {
+            color: var(--text-white);
+            background: #0a0a14;
+        }
+
+
+        /* =========================================================
+           8. CORES DOS RESULTADOS
+           ========================================================= */
+
+        .text-cyan {
+            color: var(--neon-cyan);
+        }
+
+        .text-green {
+            color: var(--neon-green);
+        }
+
+        .text-orange {
+            color: var(--neon-orange);
+        }
+
+        .text-purple {
+            color: var(--neon-purple);
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .result-value {
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.05rem;
+        }
+
+        .result-value--large {
+            font-size: 1.15rem;
+        }
+
+
+        /* =========================================================
+           9. LINHAS DE DESTAQUE
+           ========================================================= */
+
+        .row-system {
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .row-orange {
+            background:
+                rgba(255, 153, 0, 0.08);
+
+            border-left:
+                3px solid var(--neon-orange);
+        }
+
+        .row-purple {
+            background:
+                rgba(188, 19, 254, 0.08);
+
+            border-left:
+                3px solid var(--neon-purple);
+        }
+
+        .row-green {
+            background:
+                rgba(0, 255, 157, 0.08);
+
+            border-left:
+                3px solid var(--neon-green);
+        }
+
+        .row-cyan {
+            background:
+                rgba(0, 243, 255, 0.08);
+
+            border-left:
+                3px solid var(--neon-cyan);
+        }
+
+
+        /* =========================================================
+           10. BOTÕES
+           ========================================================= */
+
+        .button {
+            width: 100%;
+
+            margin-top: 10px;
+            padding: 12px 16px;
+
+            border: 1px solid transparent;
+            border-radius: var(--radius-input);
+
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+
+            cursor: pointer;
+
+            transition:
+                background var(--transition-normal),
+                color var(--transition-normal),
+                border-color var(--transition-normal),
+                box-shadow var(--transition-normal),
+                transform var(--transition-fast);
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button:focus-visible {
+            outline: 2px solid var(--text-white);
+            outline-offset: 3px;
+        }
+
+        .button--calculate {
+            color: var(--neon-cyan);
+
+            background:
+                rgba(0, 243, 255, 0.10);
+
+            border-color: var(--neon-cyan);
+        }
+
+        .button--calculate:hover {
+            color: #000000;
+            background: var(--neon-cyan);
+
+            box-shadow:
+                0 0 20px rgba(0, 243, 255, 0.25);
+        }
+
+        .button--print {
+            color: var(--neon-green);
+
+            background:
+                rgba(0, 255, 157, 0.10);
+
+            border-color: var(--neon-green);
+        }
+
+        .button--print:hover {
+            color: #000000;
+            background: var(--neon-green);
+
+            box-shadow:
+                0 0 20px rgba(0, 255, 157, 0.25);
+        }
+
+
+        /* =========================================================
+           11. ALERTA DE DIFERENÇA
+           ========================================================= */
+
+        .difference-area {
+            margin-top: auto;
+        }
+
+        .difference-alert {
+            margin-top: 10px;
+
+            padding: 10px;
+
+            border:
+                1px solid rgba(255, 255, 255, 0.10);
+
+            border-radius: var(--radius-input);
+
+            background:
+                rgba(255, 255, 255, 0.02);
+
+            color: var(--text-muted);
+
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+
+            text-align: center;
+            text-transform: uppercase;
+
+            transition:
+                background var(--transition-normal),
+                color var(--transition-normal),
+                border-color var(--transition-normal);
+        }
+
+        .difference-alert--charge {
+            color: #ff80ab;
+
+            background:
+                rgba(255, 0, 85, 0.12);
+
+            border-color: var(--neon-red);
+        }
+
+        .difference-alert--refund {
+            color: var(--neon-green);
+
+            background:
+                rgba(0, 255, 157, 0.12);
+
+            border-color: var(--neon-green);
+        }
+
+
+        /* =========================================================
+           12. VISIBILIDADE
+           ========================================================= */
+
+        [hidden] {
+            display: none !important;
+        }
+
+
+        /* =========================================================
+           13. RODAPÉ
+           ========================================================= */
+
+        .app-footer {
+            margin-top: 30px;
+            padding-bottom: 10px;
+
+            font-family: "Rajdhani", sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+
+            text-align: center;
+            text-transform: uppercase;
+
+            color: var(--neon-red);
+        }
+
+
+        /* =========================================================
+           14. DESKTOP
+           ========================================================= */
+
+        @media (min-width: 1024px) {
+
+            /* Estado inicial: somente uma coluna */
+            .calculator-grid[data-layout="single"] {
+                grid-template-columns:
+                    minmax(380px, 460px);
+
+                justify-content: center;
+            }
+
+            /* Após o cálculo: três colunas */
+            .calculator-grid[data-layout="triple"] {
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            }
+        }
+
+
+        /* =========================================================
+           15. MOBILE
+           ========================================================= */
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 10px 5px;
+            }
+
+            .app-header {
+                margin-bottom: 18px;
+            }
+
+            .app-title {
+                font-size: 1.35rem;
+            }
+
+            .app-subtitle {
+                font-size: 0.78rem;
+            }
+
+            .panel {
+                padding: 13px;
+                gap: 10px;
+            }
+
+            .data-table {
+                font-size: 0.78rem;
+            }
+
+            .data-table td {
+                padding: 7px 6px;
+            }
+
+            .input-user {
+                width: 100%;
+                max-width: 100%;
+
+                padding: 6px 8px;
+
+                font-size: 0.85rem;
+            }
+
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* =========================================================
+           16. ACESSIBILIDADE
+           Reduz animações caso o usuário tenha configurado
+           essa preferência no sistema operacional.
+           ========================================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+
+
+        /* =========================================================
+           17. IMPRESSÃO
+           ========================================================= */
+
+        @media print {
+
+            body {
+                padding: 5px;
+
+                background-color: #000000 !important;
+
+                background-image:
+                    radial-gradient(
+                        circle at top center,
+                        #0f051d 0%,
+                        #000000 100%
+                    ) !important;
+
+                color: #f8fafc !important;
+
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .calculator-grid {
+                grid-template-columns:
+                    repeat(3, 1fr) !important;
+            }
+
+            .panel {
+                background:
+                    rgba(15, 15, 26, 0.95) !important;
+
+                border-color:
+                    rgba(0, 243, 255, 0.30) !important;
+
+                box-shadow: none !important;
+
+                break-inside: avoid;
+
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .input-user {
+                color:
+                    var(--neon-cyan) !important;
+
+                background:
+                    rgba(0, 0, 0, 0.80) !important;
+
+                border-color:
+                    rgba(0, 243, 255, 0.50) !important;
+
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            select.input-user {
+                color: #ffffff !important;
+            }
+
+            .button {
+                display: none !important;
+            }
+
+            .app-footer {
+                color: var(--neon-red) !important;
+
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =========================================================
+         CABEÇALHO
+         ========================================================= -->
+
+    <header class="app-header">
+
+        <h1 class="app-title">
+            Simulador
+            <span class="app-title__highlight">
+                Calculadora de Energia
+            </span>
+        </h1>
+
+        <p class="app-subtitle">
+            Sistema Computacional de Eficiência e Compensação 4K
+        </p>
+
+    </header>
+
+
+    <!-- =========================================================
+         CONTEÚDO PRINCIPAL
+         ========================================================= -->
+
+    <main class="app-main">
+
+        <div
+            id="calculatorGrid"
+            class="calculator-grid"
+            data-layout="single"
+        >
+
+            <!-- =================================================
+                 COLUNA 1 — DADOS DA FATURA
+                 ================================================= -->
+
+            <section
+                class="panel"
+                aria-labelledby="tituloDadosFatura"
+            >
+
+                <h2
+                    id="tituloDadosFatura"
+                    class="panel__title"
+                >
+                    Dados da Fatura
+                </h2>
+
+
+                <table class="data-table">
+
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                <label for="consumo_total">
+                                    Consumo total kWh
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="consumo_total"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="taxa_disponibilidade">
+                                    Taxa disponibilidade
+                                </label>
+                            </td>
+
+                            <td>
+                                <select
+                                    id="taxa_disponibilidade"
+                                    class="input-user field-nav"
+                                >
+                                    <option value="0">
+                                        Selecione...
+                                    </option>
+
+                                    <option value="30">
+                                        Monofásico - 30 kWh
+                                    </option>
+
+                                    <option value="50">
+                                        Bifásico - 50 kWh
+                                    </option>
+
+                                    <option value="100">
+                                        Trifásico - 100 kWh
+                                    </option>
+                                </select>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="tarifa_cheia">
+                                    Tarifa Cheia/seca
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="tarifa_cheia"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-system">
+                            <td>
+                                Tarifa c/ acréscimo bandeira (Calc.)
+                            </td>
+
+                            <td
+                                id="res_tarifa_com_bandeira"
+                                class="text-orange"
+                            >
+                                0,000000
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="tarifa_compensacao">
+                                    Energia Ativa Injetada GD II
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="tarifa_compensacao"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    value="0,986600"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-system">
+                            <td>
+                                Tarifa de devolução Imposto (Calc.)
+                            </td>
+
+                            <td
+                                id="res_tarifa_dev_imposto"
+                                class="text-cyan"
+                            >
+                                0,000000
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="bandeira_amarela_val">
+                                    Acréscimo Bandeira Amarela
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="bandeira_amarela_val"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="bandeira_vermelha_val">
+                                    Acréscimo Bandeira Vermelha
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="bandeira_vermelha_val"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Disponibilidade
+                            </td>
+
+                            <td
+                                id="res_disp_qtd"
+                                class="text-muted"
+                            >
+                                0
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-system">
+                            <td>
+                                Tarifa acréscimo bandeira (Calc.)
+                            </td>
+
+                            <td id="res_tarifa_acrescimo_bandeira">
+                                0,0000
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="desc_plano_pct">
+                                    Desconto Plano %
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="desc_plano_pct"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="desc_adicional_pct">
+                                    Desconto adicional %
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="desc_adicional_pct"
+                                    class="input-user field-nav"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="res_kwh_compensado_calc">
+                                    kWh Compensado (Editável)
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="res_kwh_compensado_calc"
+                                    class="input-user field-nav text-green"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+
+                <button
+                    id="btnCalcular"
+                    class="button button--calculate"
+                    type="button"
+                >
+                    Executar Cálculo
+                </button>
+
+            </section>
+
+
+            <!-- =================================================
+                 COLUNA 2 — DESCONTOS E DEVOLUÇÕES
+                 ================================================= -->
+
+            <section
+                id="coluna2"
+                class="panel"
+                aria-labelledby="tituloAplicacoes"
+                hidden
+            >
+
+                <h2
+                    id="tituloAplicacoes"
+                    class="panel__title"
+                >
+                    Aplicações &amp; Devoluções
+                </h2>
+
+
+                <table class="data-table">
+
+                    <tbody>
+
+                        <tr>
+                            <td>kWh compensado</td>
+
+                            <td id="c2_kwh_comp">
+                                0
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Tarifa cheia c/ acréscimo
+                            </td>
+
+                            <td id="c2_tarifa_cheia_acresc">
+                                0,000000
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Tarifa compensação
+                            </td>
+
+                            <td id="c2_tarifa_comp">
+                                0,986600
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Tarifa devolução de imposto
+                            </td>
+
+                            <td id="c2_tarifa_dev">
+                                0,000000
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-orange">
+                            <td>
+                                <strong>Boleto Cheio</strong>
+                            </td>
+
+                            <td
+                                id="c2_boleto_cheio"
+                                class="result-value text-orange"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Desconto Plano %
+                            </td>
+
+                            <td
+                                id="c2_desc_plano"
+                                class="result-value"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Desconto Adicional %
+                            </td>
+
+                            <td
+                                id="c2_desc_adicional"
+                                class="result-value"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-orange">
+                            <td>
+                                <strong>Total Desconto</strong>
+                            </td>
+
+                            <td
+                                id="c2_total_desconto"
+                                class="result-value text-orange"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-green">
+                            <td>
+                                <strong>Devolução de Impostos</strong>
+                            </td>
+
+                            <td
+                                id="c2_dev_impostos"
+                                class="result-value text-green"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-orange">
+                            <td>
+                                <strong>
+                                    Boleto liq. Com Desconto
+                                </strong>
+                            </td>
+
+                            <td
+                                id="c2_boleto_liq"
+                                class="result-value text-orange"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-purple">
+                            <td>
+                                <label for="c2_boleto_origo_input">
+                                    <strong>
+                                        Boleto Órigo Sistema
+                                    </strong>
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="c2_boleto_origo_input"
+                                    class="input-user"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- Resultado da diferença -->
+                <div class="difference-area">
+
+                    <table class="data-table">
+
+                        <tbody>
+
+                            <tr class="row-orange">
+                                <td>
+                                    <strong>Diferença</strong>
+                                </td>
+
+                                <td
+                                    id="c2_diferenca"
+                                    class="result-value"
+                                    aria-live="polite"
+                                >
+                                    R$ 0,00
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+
+                    <div
+                        id="alertaDiferenca"
+                        class="difference-alert"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        Aguardando dados...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 COLUNA 3 — TARIFA FINAL
+                 ================================================= -->
+
+            <section
+                id="coluna3"
+                class="panel"
+                aria-labelledby="tituloTarifaFinal"
+                hidden
+            >
+
+                <h2
+                    id="tituloTarifaFinal"
+                    class="panel__title"
+                >
+                    Tarifa Final Órigo
+                </h2>
+
+
+                <table class="data-table">
+
+                    <tbody>
+
+                        <tr class="row-system">
+                            <td>
+                                Consumo total kWh
+                            </td>
+
+                            <td id="c3_consumo_total">
+                                0
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-cyan">
+                            <td>
+                                <strong>KWh Distribuidora</strong>
+                            </td>
+
+                            <td
+                                id="c3_tarifa_distribuidora"
+                                class="result-value text-cyan"
+                            >
+                                0,000000
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-orange">
+                            <td>
+                                <strong>Total Consumo</strong>
+                            </td>
+
+                            <td
+                                id="c3_total_consumo"
+                                class="result-value text-orange"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                Bandeiras (Amarela + Vermelha)
+                            </td>
+
+                            <td
+                                id="c3_bandeira_amarela"
+                                class="result-value"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="c3_iluminacao">
+                                    Iluminação Pública
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="c3_iluminacao"
+                                    class="input-user field-nav-c3"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="c3_juros">
+                                    Juros e outros
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="c3_juros"
+                                    class="input-user field-nav-c3"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="c3_parcelamento">
+                                    Parcelamento
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="c3_parcelamento"
+                                    class="input-user field-nav-c3"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-orange">
+                            <td>
+                                <strong>
+                                    TOTAL DISTRIBUIDORA
+                                </strong>
+                            </td>
+
+                            <td
+                                id="c3_total_distribuidora"
+                                class="result-value text-orange"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- Comparação final -->
+                <table class="data-table">
+
+                    <tbody>
+
+                        <tr class="row-cyan">
+                            <td>
+                                <label for="c3_distribuidora_input">
+                                    <strong>DISTRIBUIDORA</strong>
+                                </label>
+                            </td>
+
+                            <td>
+                                <input
+                                    id="c3_distribuidora_input"
+                                    class="input-user field-nav-c3"
+                                    type="text"
+                                    inputmode="decimal"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-purple">
+                            <td>
+                                <strong>ORIGO</strong>
+                            </td>
+
+                            <td
+                                id="c3_fatura_origo"
+                                class="result-value text-purple"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+
+                        <tr class="row-green">
+                            <td>
+                                <strong>TOTAL GERAL</strong>
+                            </td>
+
+                            <td
+                                id="res_total_geral"
+                                class="result-value text-green"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- Economia -->
+                <table class="data-table">
+
+                    <tbody>
+
+                        <tr class="row-green">
+                            <td>
+                                <strong>ECONOMIA MES</strong>
+                            </td>
+
+                            <td
+                                id="res_economia_mes"
+                                class="
+                                    result-value
+                                    result-value--large
+                                    text-green
+                                "
+                                aria-live="polite"
+                            >
+                                R$ 0,00
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+
+                <button
+                    id="btnImprimir"
+                    class="button button--print"
+                    type="button"
+                >
+                    Imprimir Tela
+                </button>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         RODAPÉ
+         ========================================================= -->
+
+    <footer class="app-footer">
+        DESIGN BY ANDRÉ LEONARDO VALE - 08/26
+    </footer>
+
+
+    <script>
+        "use strict";
+
+        /*
+         * =========================================================
+         * CALCULADORA DE ENERGIA
+         * ---------------------------------------------------------
+         * Organização do JavaScript:
+         *
+         * 1. Seletores e cache do DOM
+         * 2. Funções de formatação
+         * 3. Funções de leitura de valores
+         * 4. Máscaras monetárias/decimais
+         * 5. Cálculos
+         * 6. Atualização da interface
+         * 7. Navegação por teclado
+         * 8. Eventos
+         * =========================================================
+         */
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            /* =====================================================
+               1. CACHE DOS ELEMENTOS DO DOM
+
+               Evita executar document.getElementById repetidamente.
+               ===================================================== */
+
+            const elements = {
+
+                /* Estrutura */
+                calculatorGrid:
+                    document.getElementById("calculatorGrid"),
+
+                coluna2:
+                    document.getElementById("coluna2"),
+
+                coluna3:
+                    document.getElementById("coluna3"),
+
+
+                /* Coluna 1 */
+                consumoTotal:
+                    document.getElementById("consumo_total"),
+
+                taxaDisponibilidade:
+                    document.getElementById("taxa_disponibilidade"),
+
+                tarifaCheia:
+                    document.getElementById("tarifa_cheia"),
+
+                tarifaCompensacao:
+                    document.getElementById("tarifa_compensacao"),
+
+                bandeiraAmarela:
+                    document.getElementById("bandeira_amarela_val"),
+
+                bandeiraVermelha:
+                    document.getElementById("bandeira_vermelha_val"),
+
+                descontoPlano:
+                    document.getElementById("desc_plano_pct"),
+
+                descontoAdicional:
+                    document.getElementById("desc_adicional_pct"),
+
+                kwhCompensado:
+                    document.getElementById(
+                        "res_kwh_compensado_calc"
+                    ),
+
+
+                /* Resultados coluna 1 */
+                tarifaComBandeira:
+                    document.getElementById(
+                        "res_tarifa_com_bandeira"
+                    ),
+
+                tarifaDevImposto:
+                    document.getElementById(
+                        "res_tarifa_dev_imposto"
+                    ),
+
+                tarifaAcrescimoBandeira:
+                    document.getElementById(
+                        "res_tarifa_acrescimo_bandeira"
+                    ),
+
+                disponibilidade:
+                    document.getElementById("res_disp_qtd"),
+
+
+                /* Coluna 2 */
+                c2KwhComp:
+                    document.getElementById("c2_kwh_comp"),
+
+                c2TarifaCheia:
+                    document.getElementById(
+                        "c2_tarifa_cheia_acresc"
+                    ),
+
+                c2TarifaComp:
+                    document.getElementById("c2_tarifa_comp"),
+
+                c2TarifaDev:
+                    document.getElementById("c2_tarifa_dev"),
+
+                c2BoletoCheio:
+                    document.getElementById("c2_boleto_cheio"),
+
+                c2DescPlano:
+                    document.getElementById("c2_desc_plano"),
+
+                c2DescAdicional:
+                    document.getElementById(
+                        "c2_desc_adicional"
+                    ),
+
+                c2TotalDesconto:
+                    document.getElementById(
+                        "c2_total_desconto"
+                    ),
+
+                c2DevImpostos:
+                    document.getElementById("c2_dev_impostos"),
+
+                c2BoletoLiquido:
+                    document.getElementById("c2_boleto_liq"),
+
+                c2BoletoOrigo:
+                    document.getElementById(
+                        "c2_boleto_origo_input"
+                    ),
+
+                c2Diferenca:
+                    document.getElementById("c2_diferenca"),
+
+                alertaDiferenca:
+                    document.getElementById("alertaDiferenca"),
+
+
+                /* Coluna 3 */
+                c3ConsumoTotal:
+                    document.getElementById("c3_consumo_total"),
+
+                c3TarifaDistribuidora:
+                    document.getElementById(
+                        "c3_tarifa_distribuidora"
+                    ),
+
+                c3TotalConsumo:
+                    document.getElementById("c3_total_consumo"),
+
+                c3Bandeiras:
+                    document.getElementById(
+                        "c3_bandeira_amarela"
+                    ),
+
+                c3Iluminacao:
+                    document.getElementById("c3_iluminacao"),
+
+                c3Juros:
+                    document.getElementById("c3_juros"),
+
+                c3Parcelamento:
+                    document.getElementById("c3_parcelamento"),
+
+                c3TotalDistribuidora:
+                    document.getElementById(
+                        "c3_total_distribuidora"
+                    ),
+
+                c3DistribuidoraInput:
+                    document.getElementById(
+                        "c3_distribuidora_input"
+                    ),
+
+                c3FaturaOrigo:
+                    document.getElementById("c3_fatura_origo"),
+
+                totalGeral:
+                    document.getElementById("res_total_geral"),
+
+                economiaMes:
+                    document.getElementById("res_economia_mes"),
+
+
+                /* Botões */
+                btnCalcular:
+                    document.getElementById("btnCalcular"),
+
+                btnImprimir:
+                    document.getElementById("btnImprimir")
+            };
+
+
+            /* =====================================================
+               2. FORMATADORES
+
+               Intl.NumberFormat é utilizado para garantir
+               formatação consistente no padrão brasileiro.
+               ===================================================== */
+
+            const brlFormatter =
+                new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+
+            /**
+             * Formata um número como moeda brasileira.
+             *
+             * @param {number} value
+             * @returns {string}
+             */
+            function formatBRL(value) {
+
+                return brlFormatter.format(
+                    Number.isFinite(value) ? value : 0
+                );
+            }
+
+
+            /**
+             * Formata números utilizando casas decimais definidas.
+             *
+             * @param {number} value
+             * @param {number} decimals
+             * @returns {string}
+             */
+            function formatNumber(value, decimals = 6) {
+
+                const safeValue =
+                    Number.isFinite(value)
+                        ? value
+                        : 0;
+
+                return safeValue.toLocaleString(
+                    "pt-BR",
+                    {
+                        minimumFractionDigits: decimals,
+                        maximumFractionDigits: decimals
+                    }
+                );
+            }
+
+
+            /* =====================================================
+               3. LEITURA E CONVERSÃO DE VALORES
+               ===================================================== */
+
+            /**
+             * Converte um valor brasileiro para Number.
+             *
+             * Exemplos:
+             * "1.234,56" -> 1234.56
+             * "0,986600" -> 0.9866
+             *
+             * @param {string|number} value
+             * @returns {number}
+             */
+            function parseBrazilianNumber(value) {
+
+                if (
+                    value === null ||
+                    value === undefined ||
+                    value === ""
+                ) {
+                    return 0;
+                }
+
+                const normalized =
+                    String(value)
+                        .trim()
+                        .replace(/\./g, "")
+                        .replace(",", ".");
+
+                const number =
+                    Number.parseFloat(normalized);
+
+                return Number.isFinite(number)
+                    ? number
+                    : 0;
+            }
+
+
+            /**
+             * Obtém o valor numérico de um input.
+             *
+             * @param {HTMLInputElement|HTMLSelectElement} element
+             * @returns {number}
+             */
+            function getValue(element) {
+
+                return parseBrazilianNumber(
+                    element?.value ?? ""
+                );
+            }
+
+
+            /* =====================================================
+               4. MÁSCARA DE ENTRADA
+               ===================================================== */
+
+            /**
+             * Aplica máscara decimal conforme o usuário digita.
+             *
+             * A função preserva o comportamento original:
+             * os números digitados são interpretados considerando
+             * uma quantidade fixa de casas decimais.
+             *
+             * @param {HTMLInputElement} input
+             * @param {number} decimals
+             */
+            function applyDecimalMask(input, decimals) {
+
+                const digits =
+                    input.value.replace(/\D/g, "");
+
+                if (!digits) {
+
+                    input.value = "";
+
+                    return;
+                }
+
+                const number =
+                    Number.parseInt(digits, 10) /
+                    Math.pow(10, decimals);
+
+                input.value =
+                    number.toLocaleString(
+                        "pt-BR",
+                        {
+                            minimumFractionDigits: decimals,
+                            maximumFractionDigits: decimals
+                        }
+                    );
+            }
+
+
+            /* =====================================================
+               5. KWH COMPENSADO
+               ===================================================== */
+
+            /**
+             * Atualiza automaticamente o kWh compensado.
+             *
+             * Fórmula:
+             * consumo total - taxa de disponibilidade
+             */
+            function updateDefaultCompensatedKwh() {
+
+                const consumoTotal =
+                    getValue(elements.consumoTotal);
+
+                const taxaDisponibilidade =
+                    getValue(elements.taxaDisponibilidade);
+
+                const kwhCompensado =
+                    Math.max(
+                        0,
+                        consumoTotal -
+                        taxaDisponibilidade
+                    );
+
+                elements.kwhCompensado.value =
+                    kwhCompensado;
+            }
+
+
+            /* =====================================================
+               6. CÁLCULO PRINCIPAL
+               ===================================================== */
+
+            /**
+             * Executa todos os cálculos do sistema.
+             *
+             * @param {boolean} revealColumns
+             * Define se as colunas 2 e 3 devem ser exibidas.
+             */
+            function calculateAll(revealColumns = true) {
+
+                /* ---------------------------------------------
+                   Entrada de dados
+                   --------------------------------------------- */
+
+                const consumoTotal =
+                    getValue(elements.consumoTotal);
+
+                const taxaDisponibilidade =
+                    getValue(elements.taxaDisponibilidade);
+
+                const tarifaCheia =
+                    getValue(elements.tarifaCheia);
+
+                const energiaInjetadaGD2 =
+                    getValue(elements.tarifaCompensacao);
+
+                const bandeiraAmarela =
+                    getValue(elements.bandeiraAmarela);
+
+                const bandeiraVermelha =
+                    getValue(elements.bandeiraVermelha);
+
+                const descontoPlanoPct =
+                    getValue(elements.descontoPlano);
+
+                const descontoAdicionalPct =
+                    getValue(elements.descontoAdicional);
+
+
+                /* ---------------------------------------------
+                   Tarifa de acréscimo de bandeira
+                   --------------------------------------------- */
+
+                const totalBandeiras =
+                    bandeiraAmarela +
+                    bandeiraVermelha;
+
+
+                const tarifaAcrescimoBandeira =
+                    consumoTotal > 0
+                        ? totalBandeiras / consumoTotal
+                        : 0;
+
+
+                /* ---------------------------------------------
+                   Tarifa cheia com bandeira
+                   --------------------------------------------- */
+
+                const tarifaComBandeira =
+                    tarifaCheia +
+                    tarifaAcrescimoBandeira;
+
+
+                /* ---------------------------------------------
+                   Devolução de imposto
+                   --------------------------------------------- */
+
+                const tarifaDevolucaoImposto =
+                    Math.max(
+                        0,
+                        tarifaCheia -
+                        energiaInjetadaGD2
+                    );
+
+
+                /* ---------------------------------------------
+                   kWh compensado
+                   --------------------------------------------- */
+
+                if (!elements.kwhCompensado.value.trim()) {
+
+                    elements.kwhCompensado.value =
+                        Math.max(
+                            0,
+                            consumoTotal -
+                            taxaDisponibilidade
+                        );
+                }
+
+                const kwhCompensado =
+                    getValue(elements.kwhCompensado);
+
+
+                /* ---------------------------------------------
+                   COLUNA 1 — Resultados
+                   --------------------------------------------- */
+
+                elements.tarifaComBandeira.textContent =
+                    formatNumber(
+                        tarifaComBandeira,
+                        6
+                    );
+
+                elements.tarifaDevImposto.textContent =
+                    formatNumber(
+                        tarifaDevolucaoImposto,
+                        6
+                    );
+
+                elements.tarifaAcrescimoBandeira.textContent =
+                    formatNumber(
+                        tarifaAcrescimoBandeira,
+                        4
+                    );
+
+                elements.disponibilidade.textContent =
+                    taxaDisponibilidade;
+
+
+                /* ---------------------------------------------
+                   COLUNA 2 — Informações tarifárias
+                   --------------------------------------------- */
+
+                elements.c2KwhComp.textContent =
+                    kwhCompensado;
+
+                elements.c2TarifaCheia.textContent =
+                    formatNumber(
+                        tarifaComBandeira,
+                        6
+                    );
+
+                elements.c2TarifaComp.textContent =
+                    formatNumber(
+                        energiaInjetadaGD2,
+                        6
+                    );
+
+                elements.c2TarifaDev.textContent =
+                    formatNumber(
+                        tarifaDevolucaoImposto,
+                        6
+                    );
+
+
+                /* ---------------------------------------------
+                   COLUNA 2 — Cálculos financeiros
+                   --------------------------------------------- */
+
+                const boletoCheio =
+                    kwhCompensado *
+                    tarifaComBandeira;
+
+
+                const descontoPlano =
+                    boletoCheio *
+                    (descontoPlanoPct / 100);
+
+
+                const descontoAdicional =
+                    boletoCheio *
+                    (descontoAdicionalPct / 100);
+
+
+                const totalDesconto =
+                    descontoPlano +
+                    descontoAdicional;
+
+
+                const devolucaoImpostos =
+                    kwhCompensado *
+                    tarifaDevolucaoImposto;
+
+
+                const boletoLiquido =
+                    boletoCheio -
+                    totalDesconto -
+                    devolucaoImpostos;
+
+
+                const boletoOrigoSistema =
+                    getValue(elements.c2BoletoOrigo);
+
+
+                /* ---------------------------------------------
+                   Atualização visual da Coluna 2
+                   --------------------------------------------- */
+
+                elements.c2BoletoCheio.textContent =
+                    formatBRL(boletoCheio);
+
+                elements.c2DescPlano.textContent =
+                    formatBRL(descontoPlano);
+
+                elements.c2DescAdicional.textContent =
+                    formatBRL(descontoAdicional);
+
+                elements.c2TotalDesconto.textContent =
+                    formatBRL(totalDesconto);
+
+                elements.c2DevImpostos.textContent =
+                    formatBRL(devolucaoImpostos);
+
+                elements.c2BoletoLiquido.textContent =
+                    formatBRL(boletoLiquido);
+
+
+                /* ---------------------------------------------
+                   Diferença entre boleto calculado e Órigo
+                   --------------------------------------------- */
+
+                const diferenca =
+                    boletoLiquido -
+                    boletoOrigoSistema;
+
+
+                updateDifferenceStatus(diferenca);
+
+
+                /* ---------------------------------------------
+                   COLUNA 3 — Consumo
+                   --------------------------------------------- */
+
+                elements.c3ConsumoTotal.textContent =
+                    consumoTotal;
+
+                elements.c3TarifaDistribuidora.textContent =
+                    formatNumber(
+                        tarifaCheia,
+                        6
+                    );
+
+
+                const totalConsumo =
+                    consumoTotal *
+                    tarifaCheia;
+
+
+                elements.c3TotalConsumo.textContent =
+                    formatBRL(totalConsumo);
+
+                elements.c3Bandeiras.textContent =
+                    formatBRL(totalBandeiras);
+
+
+                /* ---------------------------------------------
+                   Valores adicionais da distribuidora
+                   --------------------------------------------- */
+
+                const iluminacaoPublica =
+                    getValue(elements.c3Iluminacao);
+
+                const juros =
+                    getValue(elements.c3Juros);
+
+                const parcelamento =
+                    getValue(elements.c3Parcelamento);
+
+
+                /* ---------------------------------------------
+                   Total da distribuidora
+                   --------------------------------------------- */
+
+                const totalDistribuidora =
+                    totalConsumo +
+                    totalBandeiras +
+                    iluminacaoPublica +
+                    juros +
+                    parcelamento;
+
+
+                elements.c3TotalDistribuidora.textContent =
+                    formatBRL(totalDistribuidora);
+
+
+                /* ---------------------------------------------
+                   Total Geral
+                   --------------------------------------------- */
+
+                const distribuidoraInformada =
+                    getValue(
+                        elements.c3DistribuidoraInput
+                    );
+
+
+                const faturaOrigo =
+                    boletoOrigoSistema;
+
+
+                const totalGeral =
+                    distribuidoraInformada +
+                    faturaOrigo;
+
+
+                elements.c3FaturaOrigo.textContent =
+                    formatBRL(faturaOrigo);
+
+                elements.totalGeral.textContent =
+                    formatBRL(totalGeral);
+
+
+                /* ---------------------------------------------
+                   Economia mensal
+                   --------------------------------------------- */
+
+                const economiaMes =
+                    totalDistribuidora -
+                    totalGeral;
+
+
+                elements.economiaMes.textContent =
+                    formatBRL(economiaMes);
+
+
+                /* ---------------------------------------------
+                   Exibe as colunas de resultados
+                   --------------------------------------------- */
+
+                if (revealColumns) {
+
+                    revealResultColumns();
+                }
+            }
+
+
+            /* =====================================================
+               7. STATUS DA DIFERENÇA
+               ===================================================== */
+
+            /**
+             * Atualiza o valor e a mensagem da diferença.
+             *
+             * @param {number} difference
+             */
+            function updateDifferenceStatus(difference) {
+
+                const absoluteDifference =
+                    Math.abs(difference);
+
+
+                elements.c2Diferenca.textContent =
+                    formatBRL(absoluteDifference);
+
+
+                /* Remove estados anteriores */
+                elements.alertaDiferenca.classList.remove(
+                    "difference-alert--charge",
+                    "difference-alert--refund"
+                );
+
+
+                if (difference > 0) {
+
+                    elements.alertaDiferenca.textContent =
+                        "Cobrar do cliente.";
+
+                    elements.alertaDiferenca.classList.add(
+                        "difference-alert--charge"
+                    );
+
+                    elements.c2Diferenca.style.color =
+                        "var(--neon-red)";
+
+                    return;
+                }
+
+
+                if (difference < 0) {
+
+                    elements.alertaDiferenca.textContent =
+                        "Devolver ao cliente.";
+
+                    elements.alertaDiferenca.classList.add(
+                        "difference-alert--refund"
+                    );
+
+                    elements.c2Diferenca.style.color =
+                        "var(--neon-green)";
+
+                    return;
+                }
+
+
+                elements.alertaDiferenca.textContent =
+                    "Sem diferença pendente.";
+
+                elements.c2Diferenca.style.color =
+                    "var(--text-main)";
+            }
+
+
+            /* =====================================================
+               8. EXIBIÇÃO DAS COLUNAS
+               ===================================================== */
+
+            /**
+             * Revela as colunas 2 e 3 e altera o layout.
+             */
+            function revealResultColumns() {
+
+                elements.coluna2.hidden = false;
+                elements.coluna3.hidden = false;
+
+                elements.calculatorGrid.dataset.layout =
+                    "triple";
+            }
+
+
+            /* =====================================================
+               9. NAVEGAÇÃO POR ENTER
+               ===================================================== */
+
+            /**
+             * Configura navegação sequencial usando Enter.
+             *
+             * @param {NodeList|Array} fields
+             * @param {Function|null} onLastField
+             */
+            function configureEnterNavigation(
+                fields,
+                onLastField = null
+            ) {
+
+                fields.forEach((field, index) => {
+
+                    field.addEventListener(
+                        "keydown",
+                        (event) => {
+
+                            if (event.key !== "Enter") {
+                                return;
+                            }
+
+                            event.preventDefault();
+
+
+                            const nextField =
+                                fields[index + 1];
+
+
+                            if (nextField) {
+
+                                nextField.focus();
+
+                                if (
+                                    typeof nextField.select ===
+                                    "function"
+                                ) {
+                                    nextField.select();
+                                }
+
+                                return;
+                            }
+
+
+                            if (
+                                typeof onLastField ===
+                                "function"
+                            ) {
+                                onLastField();
+                            }
+                        }
+                    );
+                });
+            }
+
+
+            /* Campos da primeira coluna */
+            const column1Fields =
+                Array.from(
+                    document.querySelectorAll(
+                        ".field-nav"
+                    )
+                );
+
+
+            configureEnterNavigation(
+                column1Fields,
+                () => calculateAll(true)
+            );
+
+
+            /* Campos da terceira coluna */
+            const column3Fields =
+                Array.from(
+                    document.querySelectorAll(
+                        ".field-nav-c3"
+                    )
+                );
+
+
+            configureEnterNavigation(
+                column3Fields,
+                () => {
+
+                    const lastField =
+                        column3Fields[
+                            column3Fields.length - 1
+                        ];
+
+                    lastField?.blur();
+                }
+            );
+
+
+            /* =====================================================
+               10. EVENTOS DE MÁSCARA
+               ===================================================== */
+
+            /**
+             * Associa máscara a um campo.
+             *
+             * @param {HTMLInputElement} element
+             * @param {number} decimals
+             * @param {boolean} recalculate
+             */
+            function bindDecimalMask(
+                element,
+                decimals,
+                recalculate = false
+            ) {
+
+                element.addEventListener(
+                    "input",
+                    () => {
+
+                        applyDecimalMask(
+                            element,
+                            decimals
+                        );
+
+
+                        if (recalculate) {
+
+                            calculateAll(false);
+                        }
+                    }
+                );
+            }
+
+
+            /* Tarifas com 6 casas decimais */
+            bindDecimalMask(
+                elements.tarifaCheia,
+                6
+            );
+
+            bindDecimalMask(
+                elements.tarifaCompensacao,
+                6
+            );
+
+
+            /* Valores monetários com 2 casas */
+            bindDecimalMask(
+                elements.bandeiraAmarela,
+                2
+            );
+
+            bindDecimalMask(
+                elements.bandeiraVermelha,
+                2
+            );
+
+
+            /* Campos que recalculam automaticamente */
+            bindDecimalMask(
+                elements.c2BoletoOrigo,
+                2,
+                true
+            );
+
+            bindDecimalMask(
+                elements.c3Iluminacao,
+                2,
+                true
+            );
+
+            bindDecimalMask(
+                elements.c3Juros,
+                2,
+                true
+            );
+
+            bindDecimalMask(
+                elements.c3Parcelamento,
+                2,
+                true
+            );
+
+            bindDecimalMask(
+                elements.c3DistribuidoraInput,
+                2,
+                true
+            );
+
+
+            /* =====================================================
+               11. EVENTOS DO KWH COMPENSADO
+               ===================================================== */
+
+            elements.consumoTotal.addEventListener(
+                "input",
+                updateDefaultCompensatedKwh
+            );
+
+
+            elements.taxaDisponibilidade.addEventListener(
+                "change",
+                updateDefaultCompensatedKwh
+            );
+
+
+            /* =====================================================
+               12. ENTER NO BOLETO ÓRIGO
+
+               Após preencher o boleto Órigo, o foco segue
+               automaticamente para Iluminação Pública.
+               ===================================================== */
+
+            elements.c2BoletoOrigo.addEventListener(
+                "keydown",
+                (event) => {
+
+                    if (event.key !== "Enter") {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    elements.c3Iluminacao.focus();
+                    elements.c3Iluminacao.select();
+                }
+            );
+
+
+            /* =====================================================
+               13. BOTÃO EXECUTAR CÁLCULO
+               ===================================================== */
+
+            elements.btnCalcular.addEventListener(
+                "click",
+                () => {
+
+                    calculateAll(true);
+                }
+            );
+
+
+            /* =====================================================
+               14. IMPRESSÃO
+               ===================================================== */
+
+            elements.btnImprimir.addEventListener(
+                "click",
+                () => {
+
+                    window.print();
+                }
+            );
+
+        });
+
+    </script>
+
+</body>
+</html>
